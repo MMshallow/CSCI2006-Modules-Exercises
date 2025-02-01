@@ -1,1 +1,1 @@
-{"version":1,"defects":{"Module2Test::testExercise2":3},"times":{"Module2Test::testExercise1":0.012,"Module2Test::testExercise2":0.003}}
+{"version":1,"defects":{"Module2Test::testExercise2":3,"Module3Test::testExercise1":3,"Module3Test::testExercise2":3},"times":{"Module2Test::testExercise1":0.012,"Module2Test::testExercise2":0.003,"Module3Test::testExercise1":0.017,"Module3Test::testExercise2":0.001,"Module3Test::testAdd":0.001,"Module3Test::testSubtract":0,"Module3Test::testMultiply":0,"Module3Test::testQuotient":0}}
