@@ -1,17 +1,9 @@
-<?php 
-declare(strict_types=1);
-include 'tictactoe.php';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
-</head>
-<body>
-<!--
-                                Problem 3: Tic Tac Toe Game
+<?php
+session_start();
+include 'TicTacToe.php';
+
+/*
+                 Problem 3: Tic Tac Toe Game
                                 ===============================
     Implement a browser based Tic Tac Toe Game using PHP. 
     Here is the implementation details.
@@ -46,9 +38,75 @@ include 'tictactoe.php';
 
     Note: You can write the functions in a separate file and then include that file at the top
     of this file. 
--->
+*/
     
 
-    
+// Create a new game instance
+$game = new TicTacToe();
+
+// Initialize board if not set
+if (!isset($_SESSION['board'])) {
+    $_SESSION['board'] = $game->initialize_board();
+    // X starts first
+    $_SESSION['turn'] = 'X';  
+}
+
+// Process user move
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['position'])) {
+    $position = (int)$_POST['position'];
+
+    if ($game->check_availability($_SESSION['board'], $position)) {
+        $_SESSION['board'] = $game->move($_SESSION['board'], $position, $_SESSION['turn']);
+
+        if ($game->check_wins($_SESSION['board'])) {
+            echo "<h2>Player {$_SESSION['turn']} Wins!</h2>";
+            session_destroy();
+            exit();
+        }
+
+        $_SESSION['turn'] = $game->take_turns($_SESSION['turn']);
+    } else {
+        echo "<p style='color: red;'>Invalid move! Position already taken.</p>";
+    }
+}
+
+// Reset game
+if (isset($_POST['reset'])) {
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+</head>
+<body>
+    <h1>Tic Tac Toe</h1>
+    <p>Current Turn: <strong><?php echo $_SESSION['turn']; ?></strong></p>
+
+    <table border="1" cellpadding="10" style="text-align:center; font-size:20px;">
+        <?php foreach ($_SESSION['board'] as $row): ?>
+            <tr>
+                <?php foreach ($row as $cell): ?>
+                    <td width="50" height="50"><?php echo htmlspecialchars($cell); ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+
+    <form method="POST">
+        <label for="position">Enter position (1-9): </label>
+        <input type="number" name="position" min="1" max="9" required>
+        <button type="submit">Make Move</button>
+    </form>
+
+    <form method="POST">
+        <button type="submit" name="reset">Reset Game</button>
+    </form>
 </body>
 </html>

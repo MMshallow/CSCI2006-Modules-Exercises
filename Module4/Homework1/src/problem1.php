@@ -14,18 +14,67 @@ declare(strict_types=1);
 */
 
 final class Problem1 {
-    public function get_user_info(): array {
-        // Write your code to get the user information and return it as an array.
 
-        return $user_info;
+    // Function to get user information
+    public function get_user_info(): array {
+        // Simulating user input
+        $first_name = "Mahdi";
+        $last_name = "Shallow";
+        $dob = "2000-05-14"; // YYYY-MM-DD format
+
+        return [
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'dob' => $dob
+        ];
     }
-    public function generate_password($data): string {
-        // Write your code to generate a random password from the user information.
+
+    // Function to generate a unique password
+    public function generate_password(array $data): string {
+        $all_chars = array_merge(
+            str_split($data['first_name']),
+            str_split($data['last_name']),
+            str_split(str_replace("-", "", $data['dob']))
+        );
+
+        // Remove duplicates
+        $unique_chars = array_unique($all_chars);
+        shuffle($unique_chars);
+
+        // Ensure the password has at least one uppercase, one lowercase, and one digit
+        $password = "";
+        $has_upper = false;
+        $has_lower = false;
+        $has_digit = false;
+
+        foreach ($unique_chars as $char) {
+            if (ctype_upper($char)) $has_upper = true;
+            if (ctype_lower($char)) $has_lower = true;
+            if (ctype_digit($char)) $has_digit = true;
+            $password .= $char;
+            
+            // Stop if we meet the length requirement
+            if (strlen($password) >= 6 && $has_upper && $has_lower && $has_digit) {
+                break;
+            }
+        }
+
+        // Ensure the first character is not a digit
+        if (ctype_digit($password[0])) {
+            for ($i = 1; $i < strlen($password); $i++) {
+                if (!ctype_digit($password[$i])) {
+                    // Swap first character with a non-digit
+                    [$password[0], $password[$i]] = [$password[$i], $password[0]];
+                    break;
+                }
+            }
+        }
 
         return $password;
     }
-   // You may want to write other helper functions as necessary.
-} 
+}
+
+// Instantiating the class and generating password
 /* The following code will help you view your output in web browsers.
     DO NOT EDIT or REMOVE it.
 */

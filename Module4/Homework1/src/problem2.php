@@ -13,42 +13,82 @@ declare(strict_types=1);
     to guess again. This process will continue until the player guesses the secrete number or the player plays floor((end - start) / 2).
  */
 
- final class Problem2 {
-    public function get_user_inputs(): array {
-        // Get the start and end numbers. Return an array 
-        // containing the start and end numbers.
+final class Problem2 {
 
-        return $data;
+    // Function to get a valid start and end range from the user
+    public function get_user_inputs(): array {
+        while (true) {
+            $start = readline("Enter the start number: ");
+            $end = readline("Enter the end number: ");
+
+            // Validate numeric input
+            if (!is_numeric($start) || !is_numeric($end)) {
+                echo "Error: Please enter valid numbers only.\n";
+                continue;
+            }
+
+            // Convert inputs to integers
+            $start = (int) $start;
+            $end = (int) $end;
+
+            // Ensuring valid range
+            if ($start < $end && $start >= 0) {
+                return [$start, $end];
+            }
+
+            echo "Error: Start number must be **less than** the end number and **non-negative**.\n";
+        }
     }
-    public function compare_guess($start, $end, $guess): string {
-        // Write your code here. This function must return `correct`, `high`, or `low`
-        // depending on the comparison result between the guess and the secret number.
+
+    // Function to compare the user's guess with the secret number
+    public function compare_guess(int $secret, int $guess): string {
+        if ($guess === $secret) {
+            return "correct";
+        } elseif ($guess > $secret) {
+            return "high";
+        } else {
+            return "low";
+        }
     }
- }
- // Run the program locally.
+}
+
+// Create an instance of Problem2
 $obj = new Problem2();
 $data = $obj->get_user_inputs();
 
-$start =(int)$data[0];
-$end = (int)$data[1];
-$guess = (int)readline("Enter your guess: ");
-$rounds = 1;
-$max_rounds = round(($end - $start) / 2);
+$start = $data[0];
+$end = $data[1];
+$secret_number = rand($start, $end); // Generate secret number
 
-$choice = $obj->compare_guess($start, $end, $guess);
+$max_rounds = max(1, floor(($end - $start) / 2)); // Ensure at least 1 attempt
+$rounds = 0;
+
+echo "\nI have selected a number between $start and $end. Try to guess it!\n";
 
 while ($rounds < $max_rounds) {
     $rounds++;
-    if ($choice == "correct") {
-        echo "Congratulations! You won in $rounds rounds.";
-        break;
-    } else if ($choice == "high") {
-        $guess = (int)readline("You guessed higher.\nEnter a lower guess: ");
+    
+    // Get a valid guess
+    while (true) {
+        $guess = readline("Enter your guess: ");
+
+        if (is_numeric($guess)) {
+            $guess = (int) $guess;
+            break;
+        }
+        echo "Error: Please enter a valid number.\n";
+    }
+
+    $result = $obj->compare_guess($secret_number, $guess);
+
+    if ($result === "correct") {
+        echo "Congratulations! You guessed the correct number $secret_number in $rounds rounds.\n";
+        exit();
+    } elseif ($result === "high") {
+        echo "Your guess is too high. Try again.\n";
     } else {
-        $guess = (int)readline("You guessed lower.\nEnter a higher guess: ");
+        echo "Your guess is too low. Try again.\n";
     }
 }
-if ($rounds >= $max_rounds) {
-    echo "You lost the game.\nPlease try again later.";
-}
 
+echo "You lost! The secret number was $secret_number. Better luck next time!\n";
